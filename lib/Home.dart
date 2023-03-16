@@ -11,6 +11,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 class _HomeState extends State<Home> {
+
   Stream<QuerySnapshot> _stream =
   FirebaseFirestore.instance.collection('materias').snapshots();
 
@@ -69,8 +70,7 @@ setState(() {
                           return Column(
                             children: [
                               ListTile(
-                                title: Text(
-                                    documentSnapshot['unidades_tematicas']),
+                                title: Text(" ${documentSnapshot['unidades_tematicas']} Ano: ${documentSnapshot['ano_faixa']}º ano "),
                                 subtitle: Text(documentSnapshot['habilidades']),
                               )
                               ],
