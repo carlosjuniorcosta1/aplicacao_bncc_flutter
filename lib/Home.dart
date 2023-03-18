@@ -63,9 +63,7 @@ setState(() {
               margin: EdgeInsets.only(top: 10),
         child:
         Column(
-
             children: [
-
           DropdownButton<String>(
           value: _dropFirstValue.isNotEmpty ? _dropFirstValue : null,
           icon: const Icon(Icons.arrow_downward),
@@ -90,7 +88,6 @@ setState(() {
           }).toList(),
         ),
 
-
                StreamBuilder(
                 stream: _stream,
                 builder: (context,
@@ -102,7 +99,7 @@ setState(() {
                           ListView.builder(
                       scrollDirection: Axis.vertical,
                         shrinkWrap: true,
-                        itemCount: streamSnapshot.data!.docs.length,
+                        itemCount: 6,
 
                         itemBuilder: (context, indice) {
                           DocumentSnapshot documentSnapshot =
