@@ -1,4 +1,4 @@
-import 'dart:ffi';
+
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,7 +16,7 @@ class _HomeState extends State<Home> {
 
   List<String>_dropValues = <String>[];
 
-  String _dropFirstValue = "um";
+  String _dropFirstValue = "";
   Stream<QuerySnapshot> _stream =
   FirebaseFirestore.instance.collection('materias').snapshots();
 
@@ -59,12 +59,18 @@ setState(() {
           backgroundColor: Colors.green,
         ),
         body:
+            Container(
+              margin: EdgeInsets.only(top: 10),
+        child:
         Column(
+
             children: [
+
           DropdownButton<String>(
           value: _dropFirstValue.isNotEmpty ? _dropFirstValue : null,
           icon: const Icon(Icons.arrow_downward),
-          elevation: 16,
+          elevation: 5,
+
           style: const TextStyle(color: Colors.deepPurple),
           underline: Container(
             height: 2,
@@ -85,19 +91,7 @@ setState(() {
         ),
 
 
-
-                          TextField(
-                controller: _controllerField,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "Buscar"
-                ),
-                onChanged: (query) {
-                  searchFF(query);
-                },
-              ),
-
-              StreamBuilder(
+               StreamBuilder(
                 stream: _stream,
                 builder: (context,
                     AsyncSnapshot<QuerySnapshot> streamSnapshot) {
@@ -134,7 +128,7 @@ setState(() {
               )
             ]
         )
-    );
+    ));
   }
 
 
