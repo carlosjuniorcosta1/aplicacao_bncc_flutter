@@ -17,27 +17,18 @@ class _HomeState extends State<Home> {
   List<String>_dropValues = <String>[];
 
   String _dropFirstValue = "";
+
   Stream<QuerySnapshot> _stream =
   FirebaseFirestore.instance.collection('materias').snapshots();
+  
+    TextEditingController _controllerField = TextEditingController();
 
-  TextEditingController _controllerField = TextEditingController();
-
-   searchFF(String query) async{
-
-    final result = await FirebaseFirestore.instance
-        .collection('materias')
-        .where('unidades_tematicas',
-     isEqualTo: query);
-
-setState(() {
-  _stream= result.snapshots();
-});
-  }
 
   _getList() async{
      List<String> listaUnidadesTematicasTemp = <String>[];
      var pesquisa = await FirebaseFirestore.instance.collection('materias').where('unidades_tematicas').get();
      pesquisa.docs.forEach((x) {
+
        listaUnidadesTematicasTemp.add(x.data()['unidades_tematicas']);
 
      });
@@ -46,9 +37,15 @@ setState(() {
      setState(() {
        _dropValues = listaUnidadesTematicas;
      });
+     var procura = FirebaseFirestore.instance.collection('materias')
+     .where('unidades_tematicas', isEqualTo: _dropFirstValue);
 
-     return listaUnidadesTematicas;
+     setState(() {
+       _stream = procura.snapshots();
+     });
+
   }
+
   @override
   Widget build(BuildContext context) {
      _getList();
@@ -84,6 +81,7 @@ setState(() {
             return DropdownMenuItem<String>(
               value: value,
               child: Text(value),
+
             );
           }).toList(),
         ),
@@ -99,7 +97,7 @@ setState(() {
                           ListView.builder(
                       scrollDirection: Axis.vertical,
                         shrinkWrap: true,
-                        itemCount: 6,
+                        itemCount: 10,
 
                         itemBuilder: (context, indice) {
                           DocumentSnapshot documentSnapshot =
@@ -109,7 +107,7 @@ setState(() {
                               Card(
                           child:
                               ListTile(
-                                title: Text(" ${documentSnapshot['unidades_tematicas']} Ano: ${documentSnapshot['ano_faixa']}º ano "),
+                                title: Text(" ${documentSnapshot['unidades_tematicas']}"),
                                 subtitle: Text(documentSnapshot['habilidades']),
                               ),
                                 color: Theme.of(context).colorScheme.surfaceVariant,
