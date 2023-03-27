@@ -18,6 +18,11 @@ class _HomeState extends State<Home> {
 
   String _dropFirstValue = "";
 
+  bool _sextoAnoBox = false;
+  bool _setimoAnoBox = false;
+  bool _oitavoAnoBox = false;
+
+
   Stream<QuerySnapshot> _stream =
   FirebaseFirestore.instance.collection('materias').snapshots();
   
@@ -26,29 +31,101 @@ class _HomeState extends State<Home> {
 
   _getList() async{
      List<String> listaUnidadesTematicasTemp = <String>[];
-     var pesquisa = await FirebaseFirestore.instance.collection('materias').where('unidades_tematicas').get();
+     List<String> listaAnoFaixaTemp = <String>[];
+     var pesquisa = await FirebaseFirestore.instance.collection('materias').get();
      pesquisa.docs.forEach((x) {
 
        listaUnidadesTematicasTemp.add(x.data()['unidades_tematicas']);
+       listaAnoFaixaTemp.add(x.data()['ano_faixa']);
 
      });
+     Set<String> conjuntoAnoFaixaTemp = listaAnoFaixaTemp.toSet();
+     List<String> listaAnoFaixa = conjuntoAnoFaixaTemp.toList();
+
      Set<String> listaUnidadesTematicasTemp2 = listaUnidadesTematicasTemp.toSet();
      List<String> listaUnidadesTematicas = listaUnidadesTematicasTemp2.toList();
      setState(() {
        _dropValues = listaUnidadesTematicas;
      });
-     var procura = FirebaseFirestore.instance.collection('materias')
-     .where('unidades_tematicas', isEqualTo: _dropFirstValue);
 
-     setState(() {
-       _stream = procura.snapshots();
-     });
+     if(_sextoAnoBox == true && _setimoAnoBox == false && _oitavoAnoBox ==false){
+       var procura = FirebaseFirestore.instance.collection('materias')
+           .where('ano_faixa', isEqualTo: '6').where('unidades_tematicas', isEqualTo: _dropFirstValue);
+
+       setState(() {
+         _stream = procura.snapshots();
+
+       });
+     }
+     if(_sextoAnoBox == true && _setimoAnoBox == true && _oitavoAnoBox == false){
+       var procura = FirebaseFirestore.instance.collection('materias').
+           where('ano_faixa', whereIn: ['6', '7'])
+      .where('unidades_tematicas', isEqualTo: _dropFirstValue);
+
+       setState(() {
+         _stream = procura.snapshots();
+
+       });
+     }
+     if(_sextoAnoBox == true && _setimoAnoBox == true && _oitavoAnoBox == true){
+       var procura = FirebaseFirestore.instance.collection('materias')
+       .where('ano_faixa', whereIn: ['6', '7', '8'])
+       .where('unidades_tematicas', isEqualTo: _dropFirstValue);
+
+
+       setState(() {
+         _stream = procura.snapshots();
+
+       });
+     }
+     if(_sextoAnoBox == false && _setimoAnoBox == true && _oitavoAnoBox == false){
+       var procura = FirebaseFirestore.instance.collection('materias')
+       .where('ano_faixa', isEqualTo: '7').where('unidades_tematicas', isEqualTo: _dropFirstValue);
+
+       setState(() {
+         _stream = procura.snapshots();
+
+       });
+     }
+     if(_sextoAnoBox == false && _setimoAnoBox == false && _oitavoAnoBox ==true){
+       var procura = FirebaseFirestore.instance.collection('materias')
+           .where('ano_faixa', isEqualTo: '8').where('unidades_tematicas', isEqualTo: _dropFirstValue);
+
+       setState(() {
+         _stream = procura.snapshots();
+
+       });
+     }
+
+     if(_sextoAnoBox == false && _setimoAnoBox == true && _oitavoAnoBox ==true){
+       var procura = FirebaseFirestore.instance.collection('materias')
+           .where('ano_faixa', whereIn: ['7', '8']).where('unidades_tematicas', isEqualTo: _dropFirstValue);
+
+       setState(() {
+         _stream = procura.snapshots();
+
+       });
+     }
+
+     if(_sextoAnoBox == true && _setimoAnoBox == false && _oitavoAnoBox ==true){
+       var procura = FirebaseFirestore.instance.collection('materias')
+           .where('ano_faixa', whereIn: ['6', '8']).where('unidades_tematicas', isEqualTo: _dropFirstValue);
+
+       setState(() {
+         _stream = procura.snapshots();
+
+       });
+     }
+
+
+
+
 
   }
 
   @override
   Widget build(BuildContext context) {
-     _getList();
+    _getList();
     return Scaffold(
         appBar: AppBar(
           title: Text("BNCC - Matemática"),
@@ -61,8 +138,41 @@ class _HomeState extends State<Home> {
         child:
         Column(
             children: [
+              Text("Escolha o ano", style: TextStyle(fontSize: 16),),
+              CheckboxListTile(value: _sextoAnoBox,
+                  title: Text("6º"),
+                  onChanged: (bool? newValue) {
+
+                setState(() {
+                  _sextoAnoBox = newValue!;
+                });
+                if(_sextoAnoBox == true){
+
+
+                }
+                  }),
+              CheckboxListTile(value: _setimoAnoBox,
+                  title: Text("7º"),
+                  onChanged: (bool? newValue) {
+
+                    setState(() {
+                      _setimoAnoBox = newValue!;
+                    });
+                  }),
+
+          CheckboxListTile(value: _oitavoAnoBox,
+              title: Text("8º"),
+              onChanged: (bool? val) {
+            setState(() {
+              _oitavoAnoBox = val!;
+            });
+              }),
+
+
+Text('Escolha a unidade temática', style: TextStyle(fontSize: 16),),
           DropdownButton<String>(
           value: _dropFirstValue.isNotEmpty ? _dropFirstValue : null,
+
           icon: const Icon(Icons.arrow_downward),
           elevation: 5,
 
@@ -97,7 +207,7 @@ class _HomeState extends State<Home> {
                           ListView.builder(
                       scrollDirection: Axis.vertical,
                         shrinkWrap: true,
-                        itemCount: 10,
+                        itemCount: streamSnapshot.data!.docs.length,
 
                         itemBuilder: (context, indice) {
                           DocumentSnapshot documentSnapshot =
@@ -107,7 +217,7 @@ class _HomeState extends State<Home> {
                               Card(
                           child:
                               ListTile(
-                                title: Text(" ${documentSnapshot['unidades_tematicas']}"),
+                                title: Text(" ${documentSnapshot['unidades_tematicas']} - ${documentSnapshot['ano_faixa']}º Ano"),
                                 subtitle: Text(documentSnapshot['habilidades']),
                               ),
                                 color: Theme.of(context).colorScheme.surfaceVariant,
